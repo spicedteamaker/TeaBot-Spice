@@ -30,12 +30,19 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
+import javafx.stage.Popup;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Alert.AlertType;
 
 public class Main extends Application {
 
@@ -59,7 +66,8 @@ public class Main extends Application {
 
 	public static void main(String[] args) {
 
-		System.out.println("It's tea time!");
+		System.out.println("Opening Teahouse...");
+		teaLogger.log("Opening Teahouse...");
 
 		// TODO read up on standards for configuration files on linux
 		// TODO read up on standards for log files on linux
@@ -121,7 +129,7 @@ public class Main extends Application {
 				} else {
 					System.out.println("ERROR: Could not create config file in ~/.config/teabot-spice/config");
 					teaLogger.log("ERROR: Could not create config file in ~/.config/teabot-spice/config");
-					System.exit(0);
+					System.exit(1);
 				}
 			}
 
@@ -144,22 +152,21 @@ public class Main extends Application {
 
 	// Beginning over the GUI handling steps
 	@Override
-	public void start(Stage primaryStage) {
-		
+	public void start(final Stage primaryStage) {
+				
 
 
 		// TODO figure out how to open the menu more than once
 		// after you close it. It throws an error "cannot call launch more than once"
 		
 		// pane items
-		ListView<String> orderItem = createMenuOrderItems();
+		ListView<Text> orderItem = createMenuOrderItems();
 		ListView<Button> editItemButtons = createEditButtonList();
 		ListView<Button> deleteItemButtons = createDeleteButtonList();
 		Button addItem = new Button("Add New Order");
 
 		addItem.setOnAction(new EventHandler<ActionEvent>() {
 			public void handle(ActionEvent event) {
-				System.out.println("Add new item!");
 				final ObservableList<TextField> obsSecondaryList = FXCollections.observableArrayList();
 				final ObservableList<String> obsStringList = FXCollections.observableArrayList();
 
@@ -176,9 +183,19 @@ public class Main extends Application {
 						TeaOrder newOrder = createNewTeaOrder(orderName,
 						LocalTime.of(newHours, newMinutes, 0, 0));
 						addNewTeaOrder(newOrder);
-						System.out.println("Submitted!");
+						System.out.println("Added new order at time: " + newHours + ":" + newMinutes);
+						teaLogger.log("Added new order at time: " + newHours + ":" + newMinutes);
+						Alert alert = new Alert(AlertType.INFORMATION);
+						stage.close();
+						alert.setTitle("Teabot Info");
+						alert.setHeaderText(null);
+						alert.setContentText("The new order has been added. Changes will visually appear after menu close");
+						alert.showAndWait();
+						
 					}
 				});
+				
+
 
 				obsSecondaryList.add(new TextField());
 				obsSecondaryList.add(new TextField());
@@ -205,6 +222,28 @@ public class Main extends Application {
 			}
 
 		});
+		
+		Button closeMain = new Button("Close Menu");
+		closeMain.setOnAction(new EventHandler<ActionEvent>() {
+			public void handle(ActionEvent event) {
+				primaryStage.close();
+			}
+		});
+		
+		Button exitProgram = new Button("Exit Program");
+		exitProgram.setOnAction(new EventHandler<ActionEvent>() {
+			public void handle(ActionEvent event) {
+				System.out.println("Exit Program button clicked. Shutting down...");
+				teaLogger.log("Exit Program button clicked. Shutting down...");
+				System.exit(0);
+			}
+		});
+		
+		ButtonBar bottomBar = new ButtonBar();
+		ButtonBar.setButtonData(addItem, ButtonData.LEFT);
+		ButtonBar.setButtonData(closeMain, ButtonData.OK_DONE);
+		ButtonBar.setButtonData(exitProgram, ButtonData.RIGHT);
+		bottomBar.getButtons().addAll(addItem, closeMain, exitProgram);
 
 		Label teaListLabel = new Label("Current Orders");
 
@@ -217,7 +256,7 @@ public class Main extends Application {
 		borderPane.setLeft(orderItem);
 		borderPane.setCenter(editItemButtons);
 		borderPane.setRight(deleteItemButtons);
-		borderPane.setBottom(addItem);
+		borderPane.setBottom(bottomBar);
 
 		Scene scene = new Scene(borderPane, 750, 450);
 		primaryStage.setScene(scene);
@@ -233,15 +272,18 @@ public class Main extends Application {
 
 	}
 
-	public ListView<String> createMenuOrderItems() {
+	public ListView<Text> createMenuOrderItems() {
 
 		List<TeaOrder> teaOrders = baristaBernd.getActiveOrders();
-		ListView<String> orderList = new ListView<String>();
-		ObservableList<String> obsList = FXCollections.observableArrayList();
+		ListView<Text> orderList = new ListView<Text>();
+		ObservableList<Text> obsList = FXCollections.observableArrayList();
+		
 
 		for (TeaOrder order : teaOrders) {
-
-			obsList.add(order.getOrderName() + "\n" + order.getTeaTime());
+			Text orderText = new Text();
+			orderText.setText(order.getOrderName() + ", " + order.getTeaTime());
+			orderText.setFont(Font.font(23));
+			obsList.add(orderText);
 
 		}
 
@@ -251,6 +293,7 @@ public class Main extends Application {
 	}
 
 	public ListView<Button> createEditButtonList() {
+		final Stage stage = new Stage();
 		List<TeaOrder> teaOrders = baristaBernd.getActiveOrders();
 		ListView<Button> buttonList = new ListView<Button>();
 		final ObservableList<Button> obsButtonList = FXCollections.observableArrayList();
@@ -273,7 +316,8 @@ public class Main extends Application {
 					Button submitButton = new Button("Submit");
 					submitButton.setOnAction(new EventHandler<ActionEvent>() {
 						public void handle(ActionEvent event) {
-							System.out.println("Submitted!");
+							System.out.println("Moddified Order number: " + obsButtonList.indexOf(button));
+							teaLogger.log("Moddified Order number: " + obsButtonList.indexOf(button));
 							String orderName = obsSecondaryList.get(0).getText();
 
 							System.out.println("the new name was: " + orderName);
@@ -282,8 +326,14 @@ public class Main extends Application {
 							TeaOrder replacementOrder = createNewTeaOrder(orderName,
 									LocalTime.of(newHours, newMinutes, 0, 0));
 							System.out.println(newHours + " & " + newMinutes);
-
 							replaceTeaOrder(replacementOrder, obsButtonList.indexOf(button));
+							stage.close();
+							Alert alert = new Alert(AlertType.INFORMATION);
+							alert.setTitle("Teabot Info");
+							alert.setHeaderText(null);
+							alert.setContentText("Order has been edited. Changes will visually appear after menu close");
+							alert.showAndWait();
+							
 
 						}
 					});
@@ -297,7 +347,6 @@ public class Main extends Application {
 					obsStringList.add("Minute:");
 					labelField.setItems(obsStringList);
 
-					System.out.println("weeeee");
 					BorderPane borderPane = new BorderPane();
 					borderPane.setPadding(new Insets(30, 30, 30, 30));
 					borderPane.setCenter(textField);
@@ -306,7 +355,7 @@ public class Main extends Application {
 
 					Scene scene = new Scene(borderPane, 250, 100);
 
-					Stage stage = new Stage();
+					
 					stage.setScene(scene);
 					stage.show();
 				}
@@ -335,7 +384,8 @@ public class Main extends Application {
 				public void handle(ActionEvent event) {
 					// TODO add logic to update times
 					deleteOrder(obsButtonList.indexOf(button));
-					System.out.println("Deleted!");
+					System.out.println("Deleted order number: " + obsButtonList.indexOf(button));
+					teaLogger.log("Deleted order number: " + obsButtonList.indexOf(button));
 				}
 			});
 		}
@@ -397,7 +447,7 @@ public class Main extends Application {
 			} else {
 				System.out.println("ERROR: Could not create config file in ~/.config/teabot-spice/config");
 				teaLogger.log("ERROR: Could not create config file in ~/.config/teabot-spice/config");
-				System.exit(0);
+				System.exit(1);
 			}
 
 		} catch (IOException e) {
@@ -405,6 +455,24 @@ public class Main extends Application {
 			System.exit(0);
 		}
 		
+	}
+	
+	@Override
+	public void stop(){
+		teaLogger.log("Stage is closing");
+		teaLogger.log("restarting application for UI");
+	    System.out.println("Stage is closing");
+	    System.out.println("restarting application for UI");
+	    try {
+			String rerun = "java -cp target/TeaBot-Spice-0.0.1-SNAPSHOT-jar-with-dependencies.jar spiced.tea.cup.time.Main";
+			Runtime.getRuntime().exec(rerun);
+			System.exit(0);
+			
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	/**
