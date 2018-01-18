@@ -26,7 +26,7 @@ $ java -cp target/TeaBot-Spice-0.0.1-SNAPSHOT-jar-with-dependencies.jar spiced.t
 ```
 Optionally, you can run it as a background process
 ```
-$ java -cp target/TeaBot-Spice-0.0.1-SNAPSHOT-jar-with-dependencies.jar spiced.tea.cup.time.Main &
+$ nohup java -cp target/TeaBot-Spice-0.0.1-SNAPSHOT-jar-with-dependencies.jar spiced.tea.cup.time.Main &
 ```
 
 
