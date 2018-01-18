@@ -24,6 +24,7 @@ $ ./compile.sh
 Allow the run script to be executed:
 ```
 $ chmod +x run.sh
+$ chmod +x runAsProcess.sh
 ```
 And run:
 ```
@@ -31,7 +32,7 @@ $ ./run.sh
 ```
 Optionally, you may also run it as a background process (intended):
 ```
-$ nohup ./run.sh &
+$ ./runAsProcess
 ```
 
 
