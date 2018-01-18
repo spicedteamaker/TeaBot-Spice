@@ -4,8 +4,11 @@ Teabot is a small helper bot that has one purpose in life: Tea serving. Teabot k
 Teabot is currently unstable, her code requires maintentence and may break. Please use her with care
 ### Dependencies
 Linux - No compatibility with Windows, mac OS untested
+
 Notify-send - To send messages to the desktop
+
 Openjdk8 & JFX - Compiling and running
+
 Maven - Compiling
 
 ### Installation
