@@ -14,23 +14,24 @@ Maven - Compiling
 ### Installation
 Allow the compileAndRun script to be executed:
 ```
-$ chmod + x compileAndRun
+$ chmod +x compile.sh
 ```
-Then run:
+Then compile:
 ```
-$ ./compileAndRun
+$ ./compile.sh
 ```
-Or simply compile:
+### Running
+Allow the run script to be executed:
 ```
-$ mvn clean compile assembly:single
+$ chmod +x run.sh
 ```
-And finally run:
+And run:
 ```
-$ java -cp target/TeaBot-Spice-0.0.1-SNAPSHOT-jar-with-dependencies.jar spiced.tea.cup.time.Main
+$ ./run.sh
 ```
-Optionally, you can run it as a background process
+Optionally, you may also run it as a background process (intended):
 ```
-$ nohup java -cp target/TeaBot-Spice-0.0.1-SNAPSHOT-jar-with-dependencies.jar spiced.tea.cup.time.Main &
+$ nohup ./run.sh &
 ```
 
 
