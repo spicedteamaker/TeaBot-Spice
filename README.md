@@ -9,7 +9,7 @@ Notify-send - To send messages to the desktop
 
 Openjdk8 & JFX - Compiling and running
 
-Maven - Compiling
+Maven - Building
 
 ### Installation
 Allow the compileAndRun script to be executed:
