@@ -1,6 +1,6 @@
 # TeaBot Spice
 Teabot is a small helper bot that has one purpose in life: Tea serving. Teabot keeps track of important daily times (tea orders), and notifies you when your order is ready
-### IMPORTANT
+### Important
 Teabot is currently unstable, her code requires maintentence and may break. Please use her with care
 ### Dependencies
 Linux - No compatibility with Windows, mac OS untested
