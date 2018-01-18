@@ -16,6 +16,10 @@ Allow the compileAndRun script to be executed:
 ```
 $ chmod + x compileAndRun
 ```
+Then run:
+```
+$ ./compileAndRun
+```
 Or simply compile:
 ```
 $ mvn clean compile assembly:single
